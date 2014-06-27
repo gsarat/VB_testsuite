@@ -63,7 +63,6 @@
       <HintPath>C:\Program Files (x86)\IVI Foundation\IVI\Bin\Primary Interop Assemblies\Keithley.Ke26XXA.Interop.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="NationalInstruments.Analysis.Professional, Version=13.0.45.242, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
     <Reference Include="NationalInstruments.Common, Version=13.0.40.190, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
     <Reference Include="NationalInstruments.DAQmx, Version=9.8.45.42, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=x86" />
     <Reference Include="NationalInstruments.NI4882, Version=13.0.45.159, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
@@ -157,31 +156,31 @@
     <Compile Include="forms\frmWLfinetune.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Hardware\classes\classesGeneral\attrDeviceMapping.vb" />
-    <Compile Include="Hardware\classes\classesGeneral\clsHardwareConfiguration.vb" />
-    <Compile Include="Hardware\classes\classesGeneral\clsDeviceAssignments.vb" />
-    <Compile Include="Hardware\classes\classesInstrumentConnections\clsDAQ.vb" />
-    <Compile Include="Hardware\classes\classesInstrumentConnections\clsEthernetDevice.vb" />
-    <Compile Include="Hardware\classes\classesInstrumentConnections\clsGPIBDevice.vb" />
-    <Compile Include="Hardware\classes\classesInstrumentConnections\clsSerialDevice.vb" />
-    <Compile Include="Hardware\classes\classesMatrixSwitches\clsKeithley2700.vb" />
-    <Compile Include="Hardware\classes\classesSMU\clsKeithley2400.vb" />
-    <Compile Include="Hardware\classes\classesSMU\clsKeithley2602.vb" />
-    <Compile Include="Hardware\classes\classesSMU\clsKeithley24xx.vb" />
-    <Compile Include="Hardware\classes\classesSMU\clsKeithley26xx.vb" />
-    <Compile Include="Hardware\classes\classesTemperatureController\clsKeithley2510.vb" />
-    <Compile Include="Hardware\classes\classesTemperatureController\clsPro8TED8040.vb" />
-    <Compile Include="Hardware\interfaces\intfcCurrentMeter.vb" />
-    <Compile Include="Hardware\interfaces\intfcCurrentSource.vb" />
-    <Compile Include="Hardware\interfaces\intfcDeviceStatusEvents.vb" />
-    <Compile Include="Hardware\interfaces\intfcMeasurementInstrument.vb" />
-    <Compile Include="Hardware\interfaces\intfcOSA.vb" />
-    <Compile Include="Hardware\interfaces\intfcMatrixSwitch.vb" />
-    <Compile Include="Hardware\interfaces\intfcSourceMeasureUnit.vb" />
-    <Compile Include="Hardware\interfaces\intfcTemperatureController.vb" />
-    <Compile Include="Hardware\interfaces\intfcVoltageMeter.vb" />
-    <Compile Include="Hardware\interfaces\intfcVoltageSource.vb" />
-    <Compile Include="Hardware\modules\modGlobalsHardware.vb" />
+    <Compile Include="hardware\classes\classesGeneral\attrDeviceMapping.vb" />
+    <Compile Include="hardware\classes\classesGeneral\clsHardwareConfiguration.vb" />
+    <Compile Include="hardware\classes\classesGeneral\clsDeviceAssignments.vb" />
+    <Compile Include="hardware\classes\classesInstrumentConnections\clsDAQ.vb" />
+    <Compile Include="hardware\classes\classesInstrumentConnections\clsEthernetDevice.vb" />
+    <Compile Include="hardware\classes\classesInstrumentConnections\clsGPIBDevice.vb" />
+    <Compile Include="hardware\classes\classesInstrumentConnections\clsSerialDevice.vb" />
+    <Compile Include="hardware\classes\classesMatrixSwitches\clsKeithley2700.vb" />
+    <Compile Include="hardware\classes\classesSMU\clsKeithley2400.vb" />
+    <Compile Include="hardware\classes\classesSMU\clsKeithley2602.vb" />
+    <Compile Include="hardware\classes\classesSMU\clsKeithley24xx.vb" />
+    <Compile Include="hardware\classes\classesSMU\clsKeithley26xx.vb" />
+    <Compile Include="hardware\classes\classesTemperatureController\clsKeithley2510.vb" />
+    <Compile Include="hardware\classes\classesTemperatureController\clsPro8TED8040.vb" />
+    <Compile Include="hardware\interfaces\intfcCurrentMeter.vb" />
+    <Compile Include="hardware\interfaces\intfcCurrentSource.vb" />
+    <Compile Include="hardware\interfaces\intfcDeviceStatusEvents.vb" />
+    <Compile Include="hardware\interfaces\intfcMeasurementInstrument.vb" />
+    <Compile Include="hardware\interfaces\intfcOSA.vb" />
+    <Compile Include="hardware\interfaces\intfcMatrixSwitch.vb" />
+    <Compile Include="hardware\interfaces\intfcSourceMeasureUnit.vb" />
+    <Compile Include="hardware\interfaces\intfcTemperatureController.vb" />
+    <Compile Include="hardware\interfaces\intfcVoltageMeter.vb" />
+    <Compile Include="hardware\interfaces\intfcVoltageSource.vb" />
+    <Compile Include="hardware\modules\modGlobalsHardware.vb" />
     <Compile Include="modules\modGlobals.vb" />
     <Compile Include="modules\modLog.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -253,10 +252,10 @@
     <None Include="Resources\PacketPhotonics_Logo.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Hardware\classes\classesMeters\" />
-    <Folder Include="Hardware\classes\classesOSA\" />
-    <Folder Include="Hardware\classes\classesSources\" />
-    <Folder Include="Hardware\forms\" />
+    <Folder Include="hardware\classes\classesMeters\" />
+    <Folder Include="hardware\classes\classesOSA\" />
+    <Folder Include="hardware\classes\classesSources\" />
+    <Folder Include="hardware\forms\" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="IviDriverLib">
