@@ -1,0 +1,468 @@
+Public Class clsAgilent70950A
+    Inherits clsGPIBDevice
+    Implements intfcOpticalSpectrumAnalyser
+
+#Region "Interface Variables"
+    Private mWavelengthCenterPosition As Double
+    Private mWavelengthSpan As Double
+    Private mWavelengthStart As Double
+    Private mWavelengthStop As Double
+    Private mResolutionBandwidth As Double
+    Private mAmplitudeVariationAveraging As Integer
+    Private mSweepThroughMeasurmentRange As Boolean
+    Private mReadTraceData As String
+    Private mSweepMode As intfcOpticalSpectrumAnalyser.enumSweepMode
+#End Region
+
+#Region "Member Variables for every class"
+    Private mBMInit As Boolean
+    Private mAMInit As Boolean
+    Private mAMOn As Boolean
+    Private mAMLocal As Boolean
+#End Region
+
+#Region "Device specific Variables"
+
+    Private mClearStatus As Boolean
+    Private mServiceRequestMode As enumServiceRequestMode
+    Private mTraceDefinitionTraceA As Integer
+    Private mSensitivity As Double
+    Private mReferenceLevel As Double
+    Private mLogarithmicAmplitudeScale As Double
+    Private mSweepOnDemand As Boolean
+    Private mTraceDataFormat As enumTraceDataFormat
+    Private mSpecifiyDataLength As enumSpecifiyDataLength
+
+    Public Enum enumServiceRequestMode
+        RQS
+        ErrorPresent
+        CommandComplete '4
+        EndOfSweep
+        Message
+        TriggerArmed    '0
+    End Enum
+
+    Public Enum enumTraceDataFormat
+        Parameter
+        Measurement
+        Absolute
+        Indefinite
+        Binary
+    End Enum
+
+    Public Enum enumSpecifiyDataLength
+        _Byte
+        Word
+    End Enum
+
+#End Region
+
+#Region "Common Methods"
+    Public Sub New()
+        Me.GPIBIdnString = "HP70950B"
+    End Sub
+
+    Public Overrides Sub Init()
+        If Me.BeforeMeas_Init Then
+            If mVISASession IsNot Nothing Then
+
+                ClearStatus()
+                ServiceRequestMode = enumServiceRequestMode.TriggerArmed
+                'TraceDefinitionTraceA = 2048
+                Sensitivity = -85
+                ReferenceLevel = -20
+                LogarithmicAmplitudeScale = 10
+                'AmplitudeVariationAveraging = 1 ' 0
+                ServiceRequestMode = enumServiceRequestMode.CommandComplete
+                SweepOnDemand()
+                TraceDataFormat = enumTraceDataFormat.Binary
+                TraceDataFormat = enumTraceDataFormat.Parameter
+                SpecifiyDataLength = enumSpecifiyDataLength.Word
+
+            End If
+        End If
+    End Sub
+
+    Public Overrides ReadOnly Property Name() As String
+        Get
+            Return "Agilent70950A_v1"
+        End Get
+    End Property
+
+    Public Overrides Sub SetToDefaultSettings()
+
+    End Sub
+
+    Protected Overrides ReadOnly Property getGPIBIdnQuery() As String
+        Get
+            Return "ID?"
+        End Get
+    End Property
+
+    Public Function formatString(ByVal str As String) As String
+        formatString = str.Replace(","c, "."c)
+    End Function
+#End Region
+
+#Region "Interface Methods"
+    Public Property WavelengthCenterPosition() As Double Implements intfcOpticalSpectrumAnalyser.WavelengthCenterPosition
+        Get
+            If mVISASession IsNot Nothing Then
+                mWavelengthCenterPosition = CDbl(Val(mVISASession.Query("CENTERWL?" & vbLf))) '7-92
+            End If
+            Return mWavelengthCenterPosition
+        End Get
+        Set(ByVal value As Double)
+            mWavelengthCenterPosition = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("CENTERWL " & formatString(value) & "NM" & vbLf) ' value: numerical value + dimension, i.e. 1550nm
+            End If
+        End Set
+    End Property
+
+    Public Property WavelengthSpan() As Double Implements intfcOpticalSpectrumAnalyser.WavelengthSpan
+        Get
+            If mVISASession IsNot Nothing Then
+                mWavelengthSpan = CDbl(Val(mVISASession.Query("SP?" & vbLf)))
+            End If
+            Return mWavelengthSpan
+        End Get
+        Set(ByVal value As Double)
+            mWavelengthSpan = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("SP " & formatString(value) & "NM" & vbLf) ' 7-444
+            End If
+        End Set
+    End Property
+
+    Public Property WavelengthStart() As Double Implements intfcOpticalSpectrumAnalyser.WavelengthStart
+        Get
+            If mVISASession IsNot Nothing Then
+                mWavelengthStart = CInt(Val(mVISASession.Query("STARTWL?" & vbLf)))
+            End If
+            Return mWavelengthStart
+        End Get
+        Set(ByVal value As Double)
+            mWavelengthStart = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("STARTWL " & formatString(value) & "NM" & vbLf) '7-457
+            End If
+        End Set
+    End Property
+
+    Public Property WavelengthStop() As Double Implements intfcOpticalSpectrumAnalyser.WavelengthStop
+        Get
+            If mVISASession IsNot Nothing Then
+                mWavelengthStop = CInt(Val(mVISASession.Query("STOPWL?" & vbLf)))
+            End If
+            Return mWavelengthStop
+        End Get
+        Set(ByVal value As Double)
+            mWavelengthStop = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("STOPWL " & formatString(value) & "NM" & vbLf) '7-464
+            End If
+        End Set
+    End Property
+
+    Public Property ResolutionBandwidth() As Double Implements intfcOpticalSpectrumAnalyser.ResolutionBandwidth
+        Get
+            If mVISASession IsNot Nothing Then
+                mResolutionBandwidth = CDbl(Val(mVISASession.Query("RB?" & vbLf)))
+            End If
+            Return mResolutionBandwidth
+        End Get
+        Set(ByVal value As Double)
+            mResolutionBandwidth = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("RB " & formatString(value) & "NM" & vbLf) '7-405
+                setTraceData()
+            End If
+        End Set
+    End Property
+
+    Public Property AmplitudeVariationAveraging() As Integer Implements intfcOpticalSpectrumAnalyser.AmplitudeVariationAveraging
+        Get
+            If mVISASession IsNot Nothing Then
+                mAmplitudeVariationAveraging = CDbl(Val(mVISASession.Query("VAVG?" & vbLf)))
+            End If
+            Return mAmplitudeVariationAveraging
+        End Get
+        Set(ByVal value As Integer)
+            mAmplitudeVariationAveraging = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("VAVG " & formatString(value) & vbLf) '7-530
+            End If
+        End Set
+    End Property
+
+    Public Sub SweepThroughMeasurmentRange() Implements intfcOpticalSpectrumAnalyser.SweepThroughMeasurmentRange ' möglicherweise warten
+        If mVISASession IsNot Nothing Then
+            'mVISASession.Write("SNGLS" & vbLf)
+            If mSweepMode = intfcOpticalSpectrumAnalyser.enumSweepMode.modeSingle Then  'TODO: rücksprache
+                mVISASession.Write("SNGLS" & vbLf) 'check 7-443 for termination sign (;, LF, CR, SP, ,)
+                mVISASession.Write("TS" & vbLf) 'check 7-513 for termination sign (;, LF, CR, SP, ,)
+            Else 'continuous sweep
+                mVISASession.Write("CONTS" & vbLf)
+            End If
+            'mVISASession.Write("TDF P" & vbLf)
+            'mVISASession.Write("MDS W" & vbLf)
+            mSweepThroughMeasurmentRange = True
+        Else
+            mSweepThroughMeasurmentRange = False
+        End If
+    End Sub
+
+    Public ReadOnly Property GetSweepThroughMeasurmentRangeIndicator() As Object Implements intfcOpticalSpectrumAnalyser.GetSweepThroughMeasurmentRangeIndicator
+        Get
+            Return mSweepThroughMeasurmentRange
+        End Get
+    End Property
+
+    Public ReadOnly Property readTraceData() As Double() Implements intfcOpticalSpectrumAnalyser.readData
+        Get
+            If mVISASession IsNot Nothing Then
+                mReadTraceData = mVISASession.Query("TRA?" & vbLf) ' 7-499
+                Dim trDataStrArray() As String = mReadTraceData.Split(","c)
+                Dim trDateDblArray(trDataStrArray.Length) As Double
+                For i As Integer = 0 To trDataStrArray.Length - 1
+                    trDateDblArray(i) = CDbl(trDataStrArray(i).Replace("."c, ","c))
+                Next
+                Return trDateDblArray
+            End If
+            Dim empty(0) As Double
+            Return empty
+        End Get
+    End Property
+
+    Public Property SweepMode() As intfcOpticalSpectrumAnalyser.enumSweepMode Implements intfcOpticalSpectrumAnalyser.SweepMode
+        Get
+            Return mSweepMode
+        End Get
+        Set(ByVal value As intfcOpticalSpectrumAnalyser.enumSweepMode)
+            mSweepMode = value
+        End Set
+    End Property
+#End Region
+
+#Region "Public Methods for every Class"
+    <attrDeviceMapping("General", "BeforeMeas_Init")> _
+       Public Property BeforeMeas_Init() As Boolean
+        Get
+            Return mBMInit
+        End Get
+        Set(ByVal value As Boolean)
+            mBMInit = value
+        End Set
+    End Property
+
+    <attrDeviceMapping("General", "AfterMeas_Init")> _
+       Public Property AfterMeas_Init() As Boolean
+        Get
+            Return mAMInit
+        End Get
+        Set(ByVal value As Boolean)
+            mAMInit = value
+        End Set
+    End Property
+
+    <attrDeviceMapping("General", "AfterMeas_On")> _
+       Public Property AfterMeas_On() As Boolean
+        Get
+            Return mAMOn
+        End Get
+        Set(ByVal value As Boolean)
+            mAMOn = value
+        End Set
+    End Property
+
+    <attrDeviceMapping("General", "AfterMeas_Local")> _
+       Public Property AfterMeas_Local() As Boolean
+        Get
+            Return mAMLocal
+        End Get
+        Set(ByVal value As Boolean)
+            mAMLocal = value
+        End Set
+    End Property
+#End Region
+
+#Region "Device specific Properties"
+
+    Public Sub ClearStatus()
+        If mVISASession IsNot Nothing Then
+            mVISASession.Write("CLS;") ' & vbLf) 'check 7-98 for termination sign (;, LF, CR, SP, ,)
+            mClearStatus = True
+        Else
+            mClearStatus = False
+        End If
+    End Sub
+
+    Public ReadOnly Property GetClearStatusIndicator() As Boolean
+        Get
+            Return mClearStatus
+        End Get
+    End Property
+
+    <attrDeviceMapping("System", "ServiceRequestMode")> _
+       Public Property ServiceRequestMode() As enumServiceRequestMode
+        Get
+            Return mServiceRequestMode
+        End Get
+        Set(ByVal value As enumServiceRequestMode)
+            mServiceRequestMode = value
+            If mVISASession IsNot Nothing Then
+                Select Case value
+                    Case enumServiceRequestMode.RQS
+                        mVISASession.Write("RQS 6" & vbLf)
+                    Case enumServiceRequestMode.ErrorPresent
+                        mVISASession.Write("RQS 5" & vbLf)
+                    Case enumServiceRequestMode.CommandComplete
+                        mVISASession.Write("RQS 4" & vbLf)
+                    Case enumServiceRequestMode.EndOfSweep
+                        mVISASession.Write("RQS 2" & vbLf)
+                    Case enumServiceRequestMode.Message
+                        mVISASession.Write("RQS 1" & vbLf)
+                    Case enumServiceRequestMode.TriggerArmed
+                        mVISASession.Write("RQS 0;") ' & vbLf) '7-428
+                End Select
+            End If
+        End Set
+    End Property
+
+    <attrDeviceMapping("Memory", "TraceDefinitionTraceA")> _
+       Public Property TraceDefinitionTraceA() As Integer
+        Get
+            If mVISASession IsNot Nothing Then
+                mTraceDefinitionTraceA = CInt(Val(mVISASession.Query("TRDEF TRA,?" & vbLf)))
+            End If
+            Return mTraceDefinitionTraceA
+        End Get
+        Set(ByVal value As Integer)
+            mTraceDefinitionTraceA = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("TRDEF TRA," & CStr(value) & vbLf) '7-506
+            End If
+        End Set
+    End Property
+
+    <attrDeviceMapping("System", "Sensitivity")> _
+       Public Property Sensitivity() As Double
+        Get
+            If mVISASession IsNot Nothing Then
+                mSensitivity = CDbl(Val(mVISASession.Query("SENS?" & vbLf)))
+            End If
+            Return mSensitivity
+        End Get
+        Set(ByVal value As Double)
+            mSensitivity = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("SENS " & formatString(value) & "DBM" & vbLf) '7-438
+            End If
+        End Set
+    End Property
+
+    <attrDeviceMapping("System", "ReferenceLevel")> _
+       Public Property ReferenceLevel() As Double
+        Get
+            If mVISASession IsNot Nothing Then
+                mReferenceLevel = CDbl(Val(mVISASession.Query("RL?" & vbLf)))
+            End If
+            Return mReferenceLevel
+        End Get
+        Set(ByVal value As Double)
+            mReferenceLevel = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("RL " & formatString(value) & "DBM" & vbLf) '7-421
+            End If
+        End Set
+    End Property
+
+    <attrDeviceMapping("System", "LogarithmicAmplitudeScale")> _
+       Public Property LogarithmicAmplitudeScale() As Double
+        Get
+            If mVISASession IsNot Nothing Then
+                mLogarithmicAmplitudeScale = CDbl(Val(mVISASession.Query("LG?" & vbLf)))
+            End If
+            Return mLogarithmicAmplitudeScale
+        End Get
+        Set(ByVal value As Double)
+            mLogarithmicAmplitudeScale = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("LG " & formatString(value) & "DB" & vbLf) '7-195
+            End If
+        End Set
+    End Property
+
+    Public Sub SweepOnDemand()
+        If mVISASession IsNot Nothing Then
+            mVISASession.Write("SNGLS" & vbLf) 'check 7-443 for termination sign (;, LF, CR, SP, ,)
+            mSweepOnDemand = True
+        Else
+            mSweepOnDemand = False
+        End If
+    End Sub
+
+    Public ReadOnly Property GetSweepOnDemandIndicator() As Boolean
+        Get
+            Return mSweepOnDemand
+        End Get
+    End Property
+
+
+    <attrDeviceMapping("Format", "TraceDataFormat")> _
+       Public Property TraceDataFormat() As enumTraceDataFormat
+        Get
+            Return mTraceDataFormat
+        End Get
+        Set(ByVal value As enumTraceDataFormat)
+            mTraceDataFormat = value
+            If mVISASession IsNot Nothing Then
+                Select Case value
+                    Case enumTraceDataFormat.Parameter
+                        mVISASession.Write("TDF P" & vbLf)
+                    Case enumTraceDataFormat.Measurement
+                        mVISASession.Write("TDF M" & vbLf)
+                    Case enumTraceDataFormat.Absolute
+                        mVISASession.Write("TDF A" & vbLf)
+                    Case enumTraceDataFormat.Indefinite
+                        mVISASession.Write("TDF I" & vbLf)
+                    Case enumTraceDataFormat.Binary
+                        mVISASession.Write("TDF B" & vbLf) '7-478
+                End Select
+            End If
+        End Set
+    End Property
+
+
+    <attrDeviceMapping("Format", "SpecifiyDataLength")> _
+       Public Property SpecifiyDataLength() As enumSpecifiyDataLength
+        Get
+            Return mSpecifiyDataLength
+        End Get
+        Set(ByVal value As enumSpecifiyDataLength)
+            mSpecifiyDataLength = value
+            If mVISASession IsNot Nothing Then
+                Select Case value
+                    Case enumSpecifiyDataLength._Byte
+                        mVISASession.Write("MDS B" & vbLf)
+                    Case enumSpecifiyDataLength.Word
+                        mVISASession.Write("MDS W" & vbLf) '7-232
+                End Select
+            End If
+        End Set
+    End Property
+#End Region
+
+#Region "Device Specific Methods"
+    Public Sub setTraceData()
+        If WavelengthCenterPosition <> 0.0 AndAlso WavelengthSpan <> 0.0 AndAlso ResolutionBandwidth <> 0.0 Then
+            TraceDefinitionTraceA = (WavelengthSpan / ResolutionBandwidth) + 1 ' * 2 + 1
+        ElseIf WavelengthStart <> 0.0 AndAlso WavelengthStop <> 0.0 AndAlso ResolutionBandwidth <> 0.0 Then
+            TraceDefinitionTraceA = (WavelengthStop - WavelengthStart) / ResolutionBandwidth + 1
+        End If
+    End Sub
+#End Region
+
+
+End Class

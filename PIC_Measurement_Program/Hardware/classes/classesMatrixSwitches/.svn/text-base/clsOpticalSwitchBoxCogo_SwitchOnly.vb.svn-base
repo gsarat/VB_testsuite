@@ -1,0 +1,55 @@
+﻿'Cogo Optical Switch Box version2 (integrated LaserSource)
+' optimized version using switch system only, laser must be extern
+
+Public Class clsOpticalSwitchBoxCogo_SwitchOnly
+    Inherits clsSerialDevice
+    Implements intfcSwitchSystemOptical
+    Private mTimeout As Integer = 5
+
+    Public Overrides Sub Init()
+        '
+    End Sub
+
+    Public Overrides ReadOnly Property Name() As String
+        Get
+            Return "OpticalSwitchBoxCogo_SwitchOnly"
+        End Get
+    End Property
+
+    Public Overrides Sub SetToDefaultSettings()
+        With Me
+            .ComPort = 11
+            .BaudRate = 115200
+            .StopBit = StopBitType.One
+            .Parity = VisaNS.Parity.None
+        End With
+    End Sub
+
+    Public Sub SwitchTo(ByVal aSwitchType As intfcSwitchSystemOptical.enumSwitchType) Implements intfcSwitchSystemOptical.SwitchTo
+        Dim SwitchDACvalue As String = "255"
+        If m_VISASession IsNot Nothing Then
+            Select Case aSwitchType
+                Case intfcSwitchSystemOptical.enumSwitchType.DC_Input, intfcSwitchSystemOptical.enumSwitchType.HF_Input
+                    SwitchDACvalue = "255"
+                Case intfcSwitchSystemOptical.enumSwitchType.DC_Output, intfcSwitchSystemOptical.enumSwitchType.HF_Output
+                    SwitchDACvalue = "0"
+                Case Else
+                    Dim cEx As New CustomException("Unknown SwitchType" & vbLf)
+                    Try
+                        Throw cEx
+                    Catch anEx As CustomException
+                        anEx.Log()
+                    End Try
+                    'Endstation
+                    Throw cEx
+            End Select
+
+            Try
+                Threading.Thread.Sleep(mTimeout)
+                m_VISASession.Write("set switch dac " & SwitchDACvalue & vbCr)
+            Catch ex As Exception
+
+            End Try
+        End If
+    End Sub
+End Class

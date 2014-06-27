@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E87282AF-00ED-4F30-A716-F65D17F737EA}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>PIC_Measurement_Program.My.MyApplication</StartupObject>
+    <RootNamespace>PIC_Measurement_Program</RootNamespace>
+    <AssemblyName>PIC_Measurement_Program</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>PIC_Measurement_Program.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>PIC_Measurement_Program.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Ivi.Visa.Interop, Version=5.0.0.0, Culture=neutral, PublicKeyToken=a128c98f1d7717c1, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>C:\Program Files (x86)\IVI Foundation\VISA\VisaCom\Primary Interop Assemblies\Ivi.Visa.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Keithley.Ke26XXA.Interop, Version=1.4.5.0, Culture=neutral, PublicKeyToken=a5827328ee269399, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>C:\Program Files (x86)\IVI Foundation\IVI\Bin\Primary Interop Assemblies\Keithley.Ke26XXA.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="NationalInstruments.Analysis.Professional, Version=13.0.45.242, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.Common, Version=13.0.40.190, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.DAQmx, Version=9.8.45.42, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=x86" />
+    <Reference Include="NationalInstruments.NI4882, Version=13.0.45.159, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.UI, Version=13.0.45.242, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.UI.WindowsForms, Version=13.0.45.242, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.VisaNS, Version=13.0.45.167, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="TeeChart">
+      <HintPath>C:\Program Files (x86)\Steema Software\Steema TeeChart for .NET 2013 4.1.2013.11080\net45\x86\TeeChart.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="NationalInstruments" />
+    <Import Include="NationalInstruments.UI" />
+    <Import Include="NationalInstruments.VisaNS" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Configuration" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.IO" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="classes\clsConfigXMLConverter.vb" />
+    <Compile Include="classes\clsExceptionHandler.vb" />
+    <Compile Include="forms\frmGVmap.Designer.vb">
+      <DependentUpon>frmGVmap.vb</DependentUpon>
+    </Compile>
+    <Compile Include="forms\frmGVmap.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\frmIV_sweeps_10G_PIC.Designer.vb">
+      <DependentUpon>frmIV_sweeps_10G_PIC.vb</DependentUpon>
+    </Compile>
+    <Compile Include="forms\frmIV_sweeps_10G_PIC.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\frmIV_sweep_10G_settings.Designer.vb">
+      <DependentUpon>frmIV_sweep_10G_settings.vb</DependentUpon>
+    </Compile>
+    <Compile Include="forms\frmIV_sweep_10G_settings.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\frmLIV_sweep.Designer.vb">
+      <DependentUpon>frmLIV_sweep.vb</DependentUpon>
+    </Compile>
+    <Compile Include="forms\frmLIV_sweep.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\frmMDIParent.Designer.vb">
+      <DependentUpon>frmMDIParent.vb</DependentUpon>
+    </Compile>
+    <Compile Include="forms\frmMDIParent.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\frmMirrorReflSpectraCal.Designer.vb">
+      <DependentUpon>frmMirrorReflSpectraCal.vb</DependentUpon>
+    </Compile>
+    <Compile Include="forms\frmMirrorReflSpectraCal.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\frmSaveData.Designer.vb">
+      <DependentUpon>frmSaveData.vb</DependentUpon>
+    </Compile>
+    <Compile Include="forms\frmSaveData.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\frmSpectrumMeasurement.Designer.vb">
+      <DependentUpon>frmSpectrumMeasurement.vb</DependentUpon>
+    </Compile>
+    <Compile Include="forms\frmSpectrumMeasurement.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="forms\frmWLfinetune.Designer.vb">
+      <DependentUpon>frmWLfinetune.vb</DependentUpon>
+    </Compile>
+    <Compile Include="forms\frmWLfinetune.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Hardware\classes\classesGeneral\attrDeviceMapping.vb" />
+    <Compile Include="Hardware\classes\classesGeneral\clsHardwareConfiguration.vb" />
+    <Compile Include="Hardware\classes\classesGeneral\clsDeviceAssignments.vb" />
+    <Compile Include="Hardware\classes\classesInstrumentConnections\clsDAQ.vb" />
+    <Compile Include="Hardware\classes\classesInstrumentConnections\clsEthernetDevice.vb" />
+    <Compile Include="Hardware\classes\classesInstrumentConnections\clsGPIBDevice.vb" />
+    <Compile Include="Hardware\classes\classesInstrumentConnections\clsSerialDevice.vb" />
+    <Compile Include="Hardware\classes\classesMatrixSwitches\clsKeithley2700.vb" />
+    <Compile Include="Hardware\classes\classesSMU\clsKeithley2400.vb" />
+    <Compile Include="Hardware\classes\classesSMU\clsKeithley2602.vb" />
+    <Compile Include="Hardware\classes\classesSMU\clsKeithley24xx.vb" />
+    <Compile Include="Hardware\classes\classesSMU\clsKeithley26xx.vb" />
+    <Compile Include="Hardware\classes\classesTemperatureController\clsKeithley2510.vb" />
+    <Compile Include="Hardware\classes\classesTemperatureController\clsPro8TED8040.vb" />
+    <Compile Include="Hardware\forms\frmSimpleKeithleyControl.designer.vb">
+      <DependentUpon>frmSimpleKeithleyControl.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Hardware\forms\frmSimpleKeithleyControl.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Hardware\interfaces\intfcCurrentMeter.vb" />
+    <Compile Include="Hardware\interfaces\intfcCurrentSource.vb" />
+    <Compile Include="Hardware\interfaces\intfcDeviceStatusEvents.vb" />
+    <Compile Include="Hardware\interfaces\intfcMeasurementInstrument.vb" />
+    <Compile Include="Hardware\interfaces\intfcOSA.vb" />
+    <Compile Include="Hardware\interfaces\intfcMatrixSwitch.vb" />
+    <Compile Include="Hardware\interfaces\intfcSourceMeasureUnit.vb" />
+    <Compile Include="Hardware\interfaces\intfcTemperatureController.vb" />
+    <Compile Include="Hardware\interfaces\intfcVoltageMeter.vb" />
+    <Compile Include="Hardware\interfaces\intfcVoltageSource.vb" />
+    <Compile Include="Hardware\modules\modGlobalsHardware.vb" />
+    <Compile Include="modules\modGlobals.vb" />
+    <Compile Include="modules\modLog.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="forms\frmGVmap.resx">
+      <DependentUpon>frmGVmap.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\frmIV_sweeps_10G_PIC.resx">
+      <DependentUpon>frmIV_sweeps_10G_PIC.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\frmIV_sweep_10G_settings.resx">
+      <DependentUpon>frmIV_sweep_10G_settings.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\frmLIV_sweep.resx">
+      <DependentUpon>frmLIV_sweep.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\frmMDIParent.resx">
+      <DependentUpon>frmMDIParent.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\frmMirrorReflSpectraCal.resx">
+      <DependentUpon>frmMirrorReflSpectraCal.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\frmSaveData.resx">
+      <DependentUpon>frmSaveData.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\frmSpectrumMeasurement.resx">
+      <DependentUpon>frmSpectrumMeasurement.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="forms\frmWLfinetune.resx">
+      <DependentUpon>frmWLfinetune.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Hardware\forms\frmSimpleKeithleyControl.resx">
+      <DependentUpon>frmSimpleKeithleyControl.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\licenses.licx" />
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="My Project\app.manifest" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PacketPhotonics_Logo.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Hardware\classes\classesMeters\" />
+    <Folder Include="Hardware\classes\classesOSA\" />
+    <Folder Include="Hardware\classes\classesSources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="IviDriverLib">
+      <Guid>{47ED5120-A398-11D4-BA58-000064657374}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="IviLxiSyncLib">
+      <Guid>{47ED512A-A398-11D4-BA58-000064657374}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VisaComLib">
+      <Guid>{DB8CBF00-D6D3-11D4-AA51-00A024EE30BD}</Guid>
+      <VersionMajor>3</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

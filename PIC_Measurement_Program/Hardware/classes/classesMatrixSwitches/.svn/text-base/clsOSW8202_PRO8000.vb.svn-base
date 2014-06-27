@@ -1,0 +1,92 @@
+Public Class clsOSW8202_PRO8000
+    Inherits clsGPIBDevice
+    Implements intfcSwitchSystemOptical
+
+    Private mSlotNumber As Integer
+
+    Public Sub New()
+        Me.GPIBIdnString = "PROFILE, PRO8000, 0, Ver.4.27-1.04"
+    End Sub
+
+
+    Public Overrides Sub Init()
+        'nothing to do
+    End Sub
+
+    Public Overrides ReadOnly Property Name() As String
+        Get
+            Return "PRO8000 Thorlabs-OSW8202"
+
+        End Get
+    End Property
+
+    Public Overrides Sub SetToDefaultSettings()
+        With Me
+            .GPIBAddressNr = intfcHardwareDevice_old.enumGPIBAddressNr.AUTO
+            .SlotNumber = 3
+        End With
+    End Sub
+
+    Public Sub SwitchTo(ByVal aSwitchType As intfcSwitchSystemOptical.enumSwitchType) Implements intfcSwitchSystemOptical.SwitchTo
+        If m_VISASession IsNot Nothing Then
+
+            Select Case aSwitchType
+
+                Case intfcSwitchSystemOptical.enumSwitchType.DC_Input
+                    'nothing
+
+                Case intfcSwitchSystemOptical.enumSwitchType.DC_Output
+                    'nothing
+
+                Case intfcSwitchSystemOptical.enumSwitchType.HF_Input
+                    Me.WriteAndWait(":SLOT " & mSlotNumber & ";:OSW 1" & vbLf)
+                    Me.WriteAndWait(":SLOT " & mSlotNumber + 1 & ";:OSW 1" & vbLf)
+
+                Case intfcSwitchSystemOptical.enumSwitchType.HF_Output
+                    Me.WriteAndWait(":SLOT " & mSlotNumber & ";:OSW 2" & vbLf) 'for testing only
+                    Me.WriteAndWait(":SLOT " & mSlotNumber + 1 & ";:OSW 1" & vbLf)
+
+
+                Case intfcSwitchSystemOptical.enumSwitchType.HF_Input_alpha
+                    Me.WriteAndWait(":SLOT " & mSlotNumber & ";:OSW 1" & vbLf)
+                    Me.WriteAndWait(":SLOT " & mSlotNumber + 1 & ";:OSW 2" & vbLf)
+
+                Case intfcSwitchSystemOptical.enumSwitchType.HF_Output_alpha
+                    Me.WriteAndWait(":SLOT " & mSlotNumber & ";:OSW 2" & vbLf)
+                    Me.WriteAndWait(":SLOT " & mSlotNumber + 1 & ";:OSW 2" & vbLf)
+
+                Case Else
+                    Dim cEx As New CustomException("Unknown SwitchType" & vbLf)
+                    Try
+                        Throw cEx
+                    Catch anEx As CustomException
+                        anEx.Log()
+                    End Try
+                    'Endstation
+                    Throw cEx
+
+            End Select
+
+        End If
+
+    End Sub
+    Private Sub WriteAndWait(ByVal aWriteString As String)
+
+        m_VISASession.Write(aWriteString)
+        Threading.Thread.Sleep(150)
+        GoLocal()
+        Threading.Thread.Sleep(150)
+
+        'Me.QuerySecure(mVISASession, "*OPC?" & vbLf)
+
+    End Sub
+    <attrDeviceMapping("General", "SlotNumber")> _
+       Public Property SlotNumber() As Integer
+        Get
+            Return mSlotNumber
+        End Get
+        Set(ByVal value As Integer)
+            mSlotNumber = value
+        End Set
+    End Property
+End Class

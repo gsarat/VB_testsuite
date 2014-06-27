@@ -1,0 +1,96 @@
+Public Class clsAgilent8159X
+    Inherits clsGPIBDevice
+    Implements intfcSwitchSystemOptical
+    'Agilent-Switch 8159X in Agilent 816xA/B Lightwave Mainframe
+
+    Private mSlotNumber As Integer
+
+    Public Sub New()
+        Me.GPIBIdnString = "Agilent Technologies,8159"
+    End Sub
+
+    Protected Overrides ReadOnly Property getGPIBIdnQuery() As String
+        Get
+            Return ":SLOT" & mSlotNumber & ":IDN?"
+        End Get
+    End Property
+
+    Public Overrides Sub Init()
+        'nothing to do
+    End Sub
+
+    Public Overrides ReadOnly Property Name() As String
+        Get
+            Return "Agilent 8159X"
+        End Get
+    End Property
+
+    Public Overrides Sub SetToDefaultSettings()
+
+        With Me
+            .GPIBAddressNr = intfcHardwareDevice_old.enumGPIBAddressNr.AUTO
+            .SlotNumber = 3
+        End With
+
+    End Sub
+
+    Public Sub SwitchTo(ByVal aSwitchType As intfcSwitchSystemOptical.enumSwitchType) Implements intfcSwitchSystemOptical.SwitchTo
+
+        If m_VISASession IsNot Nothing Then
+
+            Select Case aSwitchType
+
+                Case intfcSwitchSystemOptical.enumSwitchType.DC_Input
+                    Me.WriteAndWait("ROUT" & mSlotNumber & ":CHAN1 A,1" & vbLf)
+
+                Case intfcSwitchSystemOptical.enumSwitchType.DC_Output
+                    Me.WriteAndWait("ROUT" & mSlotNumber & ":CHAN1 B,1" & vbLf)
+
+                Case intfcSwitchSystemOptical.enumSwitchType.HF_Input
+                    Me.WriteAndWait("ROUT" & mSlotNumber & ":CHAN1 A,1" & vbLf)
+                    Me.WriteAndWait("ROUT" & mSlotNumber + 1 & ":CHAN1 A,1" & vbLf)
+
+                Case intfcSwitchSystemOptical.enumSwitchType.HF_Output
+                    Me.WriteAndWait("ROUT" & mSlotNumber & ":CHAN1 B,1" & vbLf)
+                    Me.WriteAndWait("ROUT" & mSlotNumber + 1 & ":CHAN1 A,1" & vbLf)
+
+                Case intfcSwitchSystemOptical.enumSwitchType.HF_Input_alpha
+                    Me.WriteAndWait("ROUT" & mSlotNumber & ":CHAN1 A,1" & vbLf)
+                    Me.WriteAndWait("ROUT" & mSlotNumber + 1 & ":CHAN1 A,2" & vbLf)
+
+
+
+                Case Else
+                    Dim cEx As New CustomException("Unknown SwitchType" & vbLf)
+                    Try
+                        Throw cEx
+                    Catch anEx As CustomException
+                        anEx.Log()
+                    End Try
+                    'Endstation
+                    Throw cEx
+
+            End Select
+
+        End If
+
+    End Sub
+
+    <attrDeviceMapping("General", "SlotNumber")> _
+       Public Property SlotNumber() As Integer
+        Get
+            Return mSlotNumber
+        End Get
+        Set(ByVal value As Integer)
+            mSlotNumber = value
+        End Set
+    End Property
+
+    Private Sub WriteAndWait(ByVal aWriteString As String)
+
+        m_VISASession.Write(aWriteString)
+        Me.QuerySecure(m_VISASession, "*OPC?" & vbLf)
+
+    End Sub
+
+End Class

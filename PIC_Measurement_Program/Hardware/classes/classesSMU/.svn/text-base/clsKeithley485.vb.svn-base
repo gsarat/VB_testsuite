@@ -1,0 +1,183 @@
+﻿Public Class clsKeithley485
+    Inherits clsGPIBDevice
+    Implements intfcAmMeter
+
+    Private mRange As enumMeasurementRangeSettings
+    Private mTrigger As enumTriggerSettings
+    Private mRelativeCurrent As Boolean
+    Private mDataFormat As enumDataFormat
+    Private mZeroCheck As Boolean
+    Private mLOG As Boolean
+    Private mEOI As Boolean
+
+    Public Overrides Sub SetToDefaultSettings()
+        With Me
+            .GPIBAddressNr = intfcHardwareDevice.enumGPIBAddressNr.AUTO
+            .GPIBIdnString = "Picoamperemeter"
+        End With
+
+        Trigger = enumTriggerSettings.OneShotOnTalk
+        Range = enumMeasurementRangeSettings.Auto
+        DataFormat = enumDataFormat.WithoutPrefix
+        RelativeCurrent = False
+        mZeroCheck = False
+        mLOG = False
+        mEOI = True
+
+    End Sub
+
+    Public Overrides ReadOnly Property Name() As String
+        Get
+            Return "Keithley485"
+        End Get
+    End Property
+
+    Public Overrides Sub Init()
+        If mVISASession IsNot Nothing Then
+            Trigger = mTrigger
+            Range = mRange
+            RelativeCurrent = mRelativeCurrent
+            DataFormat = mDataFormat
+        End If
+    End Sub
+
+    Public Function ReadCurrent() As Double Implements intfcAmMeter.ReadCurrent 'TODO: continuous meassurements?
+        If mVISASession IsNot Nothing Then
+            Select Case mTrigger
+                Case enumTriggerSettings.ContinuousOnGET Or enumTriggerSettings.OneShotOnGET
+                    mVISASession.AssertTrigger()
+                    Return Val(mVISASession.ReadString())
+                Case enumTriggerSettings.ContinuousOnX Or enumTriggerSettings.OneShotOnX
+                    'mVISASession.Write("T" & Trim(Str(mTrigger)) & "X" & vbLf)
+                    Return Val(mVISASession.Query("X" & vbLf))
+                Case enumTriggerSettings.ContinuousOnTalk Or enumTriggerSettings.OneShotOnTalk
+                    Return Val(mVISASession.ReadString())
+            End Select
+            Return 0
+        Else
+            Return 0
+        End If
+    End Function
+
+    <attrDeviceMapping("Sense", "MeasurementRange")> _
+    Public Property Range() As enumMeasurementRangeSettings
+        Get
+            Return mRange
+        End Get
+        Set(ByVal value As enumMeasurementRangeSettings)
+            mRange = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("R" & Trim(Str(mRange)) & "X" & vbLf)
+            End If
+        End Set
+    End Property
+
+    <attrDeviceMapping("Trigger", "Trigger")> _
+    Public Property Trigger() As enumTriggerSettings
+        Get
+            Return mTrigger
+        End Get
+        Set(ByVal value As enumTriggerSettings)
+            mTrigger = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("T" & Trim(Str(mTrigger)) & "X" & vbLf)
+            End If
+        End Set
+    End Property
+
+    <attrDeviceMapping("Format", "Format")> _
+    Public Property DataFormat() As enumDataFormat
+        Get
+            Return mDataFormat
+        End Get
+        Set(ByVal value As enumDataFormat)
+            mDataFormat = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("G" & Trim(Str(mDataFormat)) & "X" & vbLf)
+            End If
+        End Set
+    End Property
+
+    <attrDeviceMapping("Sense", "RelativeCurrent")> _
+    Public Property RelativeCurrent() As Boolean
+        Get
+            Return mRelativeCurrent
+        End Get
+        Set(ByVal value As Boolean)
+            mRelativeCurrent = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("Z" & Math.Abs(CInt(mRelativeCurrent)).ToString & "X" & vbLf)
+            End If
+        End Set
+    End Property
+
+    <attrDeviceMapping("General", "ZeroCheck")> _
+    Public Property ZeroCheck() As Boolean
+        Get
+            Return mZeroCheck
+        End Get
+        Set(ByVal value As Boolean)
+            mZeroCheck = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("C" & Math.Abs(CInt(mZeroCheck)).ToString & "X" & vbLf)
+            End If
+        End Set
+    End Property
+
+    <attrDeviceMapping("General", "LOG")> _
+    Public Property LOG() As Boolean
+        Get
+            Return mLOG
+        End Get
+        Set(ByVal value As Boolean)
+            mLOG = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("D" & Math.Abs(CInt(mLOG)).ToString & "X" & vbLf)
+            End If
+        End Set
+    End Property
+
+    <attrDeviceMapping("General", "EOI")> _
+    Public Property EOI() As Boolean
+        Get
+            Return mEOI
+        End Get
+        Set(ByVal value As Boolean)
+            mEOI = value
+            If mVISASession IsNot Nothing Then
+                mVISASession.Write("K" & Math.Abs(CInt(Not mEOI)).ToString & "X" & vbLf)
+            End If
+        End Set
+    End Property
+
+    Public Enum enumMeasurementRangeSettings
+        Auto = 0
+        _2nA = 1
+        _20nA = 2
+        _200nA = 3
+        _2uA = 4
+        _20uA = 5
+        _200uA = 6
+        _2mA = 7
+    End Enum
+
+    Public Enum enumRelativeCurrent
+        MeasureAbsolutCurrent = 0
+        MeasureRelativeCurrent = 1
+    End Enum
+
+    Public Enum enumTriggerSettings
+        ContinuousOnTalk = 0
+        OneShotOnTalk = 1
+        ContinuousOnGET = 2
+        OneShotOnGET = 3
+        ContinuousOnX = 4
+        OneShotOnX = 5
+    End Enum
+
+    Public Enum enumDataFormat
+        WithPrefix = 0
+        WithoutPrefix = 1
+    End Enum
+
+End Class

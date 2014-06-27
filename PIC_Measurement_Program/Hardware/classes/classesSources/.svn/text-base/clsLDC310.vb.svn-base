@@ -1,0 +1,25 @@
+﻿Public Class clsLDC310
+    Inherits clsLDC3xx
+
+    Public Overrides ReadOnly Property Name() As String
+        Get
+            Return "LDC 310"
+        End Get
+    End Property
+
+    Public Overrides Sub SetToDefaultSettings()
+        GPIBAdressNr = intfcHardwareDevice.enumGPIBAddressNr.Nr10
+        ResetOnStartup = False
+        AnswerMode = enumAnswerMode.FullMode
+        Timeout = 2000
+        OperationMode = enumOperationMode.constCurrent
+        LaserDiodePolarity = enumDiodePolarity.CathodeGrounded
+        PhotoDiodePolarity = enumDiodePolarity.CathodeGrounded
+        PhotoDiodeBias = False
+        PhotoDiodeCalibration = 1
+        LaserDiodeCurrent = 0
+        PhotodiodeCurrent = 0
+        Power = 0
+        Oversampling = 5
+    End Sub
+End Class

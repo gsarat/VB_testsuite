@@ -1,0 +1,60 @@
+﻿'Class for accessing the Keithley2400 MultiMeter
+Public Class clsKeithley2400
+
+    Inherits clsKeithley24xx
+
+    Public Sub New()
+        Me.GPIBIdnString = "KEITHLEY INSTRUMENTS INC.,MODEL 2400"
+    End Sub
+
+    Public Overrides ReadOnly Property Name() As String
+        Get
+            Return "Keithley2400"
+        End Get
+    End Property
+
+
+
+    Public Overrides Sub SetToDefault()
+
+        With Me
+
+            .GPIBAddressNr = clsGPIBDevice.enumGPIBAddressNr.AUTO
+
+            .Beeper = False
+            .PanelType = enumPanelType.RearPanelJacks
+
+            .SenseAutoRange = False
+            .SenseResistanceMode = enumResMode.Auto
+            .SenseAutoZero = False
+            .SenseMax = 0.0001
+            .SenseType = enumSenseTypes.Current
+            .SenseSpeed = enumSenseSpeed.Normal
+
+            .RemoteSensing = False
+            .GuardType = enumGuardType.GuardCable
+
+            .SenseAVGFilterType = enumSenseAVGFilterType.Moving
+            .SenseAVGCount = 1
+            .SenseAVGEnabled = False
+
+            .SourceType = enumSourceType.Voltage
+            '.SourceShape = enumSourceShape.DC
+            .SourceMode = enumSourceMode.Fixed
+            .SourceAutoRange = False
+
+            .SourceCurrentProtectionLevel = 0.0015
+            .SourceVoltageProtectionLevel = 5
+
+            .BeforeMeas_Init = True
+
+            .AfterMeas_Init = False
+            .AfterMeas_Local = True
+            .AfterMeas_On = False
+            .AfterMeas_Zero = True
+
+        End With
+
+    End Sub
+
+End Class

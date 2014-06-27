@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/Hardware/!svn/ver/269/classes/classesConnections
+END
+clsEthernetDevice.vb
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/Hardware/!svn/ver/229/classes/classesConnections/clsEthernetDevice.vb
+END
+clsSerialDevice.vb
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/Hardware/!svn/ver/229/classes/classesConnections/clsSerialDevice.vb
+END
+clsGPIBDevice.vb
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/Hardware/!svn/ver/269/classes/classesConnections/clsGPIBDevice.vb
+END
+clsDAQ.vb
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/Hardware/!svn/ver/245/classes/classesConnections/clsDAQ.vb
+END

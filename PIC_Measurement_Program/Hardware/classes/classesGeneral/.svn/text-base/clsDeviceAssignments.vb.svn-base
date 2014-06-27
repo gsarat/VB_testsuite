@@ -1,0 +1,441 @@
+﻿'Contains the Device-Assignments
+'Provides the HardwareDevices for the Measurement Classes (in "DeviceAssignments")
+'Loads and Saves the Assignments
+'"Recognizes" what HardwareDevice-Classes are available (by scanning the Class-Structure of SubClasses of intfcHardwareDevice)
+'"Recognizes" what HardwareDevice-Classes can be used for a type of needed Hardware (e.g. what LaserClasses can be used for clsDeviceAssignmentHardware.Laser)
+Public Class clsDeviceAssignments
+
+    Public Class clsDeviceAssignmentHardware
+
+        Public Laser As intfcLaser
+        Public PreAmp As intfcPreAmp
+
+        Public Motors_Fiber As intfcMotorController
+        Public Motors_Fiber_Piezos As intfcMotorController
+        Public Motors_Chip As intfcMotorController
+        Public Motors_Probehead As intfcMotorController
+        Public Motors_Microscope As intfcMotorController
+        Public Motors_Rotation As intfcMotorController
+
+        Public SwitchSystem_Matrix As intfcSwitchSystemElectrical
+        Public SwitchSystem_Optical As intfcSwitchSystemOptical
+
+        Public AmMeter_Modulator As intfcAmMeter
+        Public CurveTracer_UIElectrodes As intfcCurveTracer_VoltageToCurrent
+
+        Public VoltageSource_ModulatorBias As intfcVoltageSource
+        Public VoltageSource_AsymmetryBias As intfcVoltageSource
+
+        Public VoltageSource_ControlElectrodeTop As intfcVoltageSource
+        Public VoltageSource_ControlElectrodeBottom As intfcVoltageSource
+
+        'Phase Electrodes as current source
+        Public CurrentSource_PhaseElectrodeP1 As intfcCurrentSource
+        Public CurrentSource_PhaseElectrodeP2 As intfcCurrentSource
+        Public CurrentSource_PhaseElectrodeP3 As intfcCurrentSource
+        Public CurrentSource_PhaseElectrodeP4 As intfcCurrentSource
+        Public CurrentSource_PhaseElectrodeP5 As intfcCurrentSource
+        Public CurrentSource_PhaseElectrodeP6 As intfcCurrentSource
+
+        'Phase Electrodes for complex Modulators
+        Public VoltageSource_PhaseElectrodeP1 As intfcVoltageSource
+        Public VoltageSource_PhaseElectrodeP2 As intfcVoltageSource
+        Public VoltageSource_PhaseElectrodeP3 As intfcVoltageSource
+        Public VoltageSource_PhaseElectrodeP4 As intfcVoltageSource
+        Public VoltageSource_PhaseElectrodeP5 As intfcVoltageSource
+        Public VoltageSource_PhaseElectrodeP6 As intfcVoltageSource
+
+        'Phase Electrodes for complex Modulators - IV Curves
+        Public CurveTracer_PhaseElectrodeP1 As intfcCurveTracer_VoltageToCurrent
+        Public CurveTracer_PhaseElectrodeP2 As intfcCurveTracer_VoltageToCurrent
+        Public CurveTracer_PhaseElectrodeP3 As intfcCurveTracer_VoltageToCurrent
+        Public CurveTracer_PhaseElectrodeP4 As intfcCurveTracer_VoltageToCurrent
+        Public CurveTracer_PhaseElectrodeP5 As intfcCurveTracer_VoltageToCurrent
+        Public CurveTracer_PhaseElectrodeP6 As intfcCurveTracer_VoltageToCurrent
+        Public CurveTracer_MonitorDiodeM1 As intfcCurveTracer_VoltageToCurrent
+        Public CurveTracer_MonitorDiodeM2 As intfcCurveTracer_VoltageToCurrent
+
+        'Monitor Diodes for complex Modulators
+        Public VoltageSource_MonitorDiodeM1Bias As intfcVoltageSource
+        Public VoltageSource_MonitorDiodeM2Bias As intfcVoltageSource
+        Public AmMeter_MonitorDiodeM1 As intfcAmMeter
+        Public AmMeter_MonitorDiodeM2 As intfcAmMeter
+
+        Public Voltmeter_Photodiode As intfcVoltmeter
+        Public Voltmeter_Laser As intfcVoltmeter
+
+        Public VoltageSource_UElectrode As intfcVoltageSource
+        Public VoltageSource_IElectrode As intfcVoltageSource
+
+        'Signal Electrodes for complex Modulators
+        Public VoltageSource_SignalElectrodeS1 As intfcVoltageSource
+        Public VoltageSource_SignalElectrodeS2 As intfcVoltageSource
+        Public VoltageSource_SignalElectrodeS3 As intfcVoltageSource
+        Public VoltageSource_SignalElectrodeS4 As intfcVoltageSource
+
+        Public CurrentSource_LaserDiodeDriver As intfcCurrentSource
+
+        Public LightwaveComponentAnalyzer As intfcLightwaveComponentAnalyzer
+
+        Public LaserDiodeTestSystem As intfcLaserDiodeTestSystem
+        Public TemperatureController As intfcTemperatureController
+
+        Public OpticalSpectrumAnalyser As intfcOpticalSpectrumAnalyser
+
+        Public TemperatureControl_TED8040 As clsPro8TED8040
+
+        Public Camera As intfcCamera
+
+        Public OpticalFilter As intfcOpticalFilter
+
+        Public OpticalSwitchBox_Cogo As clsOpticalSwitchBoxCogo_v1
+
+        Public EDFA As clsIPG100CHardware
+
+        Public VoltageSource As intfcVoltageSource
+
+    End Class
+
+    Public Class clsAssignmentInfo
+        Public DeviceObject As intfcHardwareDevice
+        Public DeviceSetupName As String
+
+        Public Sub New()
+            '
+        End Sub
+
+        Public Sub New(ByVal objDevice As intfcHardwareDevice, ByVal strName As String)
+            DeviceObject = objDevice
+            DeviceSetupName = strName
+        End Sub
+
+    End Class
+
+    'wird mittels ReadFromConfig() zu Startbeginn des Programmes erstellt
+    Private Shared mListAssignmentInfo As New Dictionary(Of String, clsAssignmentInfo)
+
+    Public Shared DeviceAssignments As New clsDeviceAssignmentHardware
+
+    'übergibt an gConfig.Hardware_ReadFromConfig das Device welches "assignt" wurde und dessen name als string
+    'übergibt in _default.config gespeicherte Wertzuweisungen an die statischen Prperties der devices
+    Public Shared Sub ReInitHardware(Optional ByVal FullReLoad As Boolean = False)
+
+        For Each anAssignment As clsAssignmentInfo In mListAssignmentInfo.Values
+            'true, wenn bereits Geräte zu DeviceAssignments hinzugefügt wurden, siehe mListAssignmentInfo
+            If anAssignment IsNot Nothing Then
+
+                If anAssignment.DeviceObject IsNot Nothing Then
+
+                    Dim boolSavePreAmpSense As Boolean = False
+                    Dim eSensitivity As intfcPreAmp.enumSensitivity
+
+                    'nur für PreAmp gültig
+                    If TryCast(anAssignment.DeviceObject, intfcPreAmp) IsNot Nothing Then
+                        boolSavePreAmpSense = (CType(anAssignment.DeviceObject, intfcPreAmp).Sensitivity <> 0) And Not FullReLoad
+                    Else
+                        boolSavePreAmpSense = False
+                    End If
+
+                    If boolSavePreAmpSense Then eSensitivity = CType(anAssignment.DeviceObject, intfcPreAmp).Sensitivity
+
+                    'für alle Geräte gültig
+                    'methode könnte auch anAssignment übergeben
+                    gConfig.Hardware_ReadFromConfig(anAssignment.DeviceObject, anAssignment.DeviceSetupName)
+
+                    If boolSavePreAmpSense Then CType(anAssignment.DeviceObject, intfcPreAmp).Sensitivity = eSensitivity
+
+                End If
+
+            End If
+        Next
+
+    End Sub
+
+    Public Shared Function AvailableHardwareClasses() As List(Of System.Type)
+
+        AvailableHardwareClasses = New List(Of System.Type)
+
+        'Debug
+        Dim aAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetExecutingAssembly
+        Dim aTypeList As System.Type() = System.Reflection.Assembly.GetExecutingAssembly.GetTypes
+
+        'find available Hardware-Classes:
+        'searches all classes of project to find all classes from type of intfcHardwareDevices
+        'and adds them to AvailableHardwareClasses
+        For Each aType As System.Type In System.Reflection.Assembly.GetExecutingAssembly.GetTypes
+
+            'If aType.IsClass And Not aType.IsAbstract Then
+            '    If GetType(intfcHardwareDevice).IsAssignableFrom(aType) Then AvailableHardwareClasses.Add(aType)
+            'End If
+
+            If aType.IsClass AndAlso Not aType.IsAbstract AndAlso Not GetType(intfcCommunication).IsAssignableFrom(aType) Then
+                If GetType(intfcHardwareDevice).IsAssignableFrom(aType) Then
+                    AvailableHardwareClasses.Add(aType)
+                End If
+            End If
+
+        Next
+
+    End Function
+
+    Public Shared Function getAvailableDevices(ByVal aType As String) As List(Of System.Type)
+
+        getAvailableDevices = New List(Of System.Type)
+
+        Try
+
+            For Each aHardwareClass As System.Type In AvailableHardwareClasses()
+                If GetType(clsDeviceAssignmentHardware).GetField(aType).FieldType.IsAssignableFrom(aHardwareClass) Then getAvailableDevices.Add(aHardwareClass)
+            Next
+
+        Catch ex As Exception
+            ThrowError("Unknown AssignmentType")
+
+        End Try
+
+    End Function
+
+    Public Shared Property DeviceAssignment(ByVal aType As String) As clsAssignmentInfo
+        Get
+
+            Try
+
+                If mListAssignmentInfo.ContainsKey(aType) Then
+                    Return mListAssignmentInfo.Item(aType)
+                Else
+                    Return Nothing
+                End If
+
+                'Return CType(GetType(clsDeviceAssignmentHardware).GetField(aType).GetValue(DeviceAssignments), intfcHardwareDevice)
+
+            Catch ex As Exception
+                ThrowError("Unknown AssignmentType")
+                Return Nothing
+
+            End Try
+
+        End Get
+        Set(ByVal value As clsAssignmentInfo)
+
+            Try
+                If mListAssignmentInfo.ContainsKey(aType) Then mListAssignmentInfo.Remove(aType)
+                mListAssignmentInfo.Add(aType, value)
+
+                If value IsNot Nothing Then
+                    GetType(clsDeviceAssignmentHardware).GetField(aType).SetValue(DeviceAssignments, value.DeviceObject)
+                Else
+                    GetType(clsDeviceAssignmentHardware).GetField(aType).SetValue(DeviceAssignments, Nothing)
+                End If
+
+            Catch ex As Exception
+                ThrowError("Unknown AssignmentType")
+
+            End Try
+
+        End Set
+
+    End Property
+
+    Public Shared Function getSettableProperties(ByVal objTarget As intfcHardwareDevice) As List(Of System.Reflection.PropertyInfo)
+
+        Dim propertyList As New List(Of String)
+
+        If objTarget.GetType Is GetType(clsDAQ_NI6259M) Then
+
+            propertyList.Add("ChannelNr")
+            propertyList.Add("ChannelType")
+            propertyList.Add("TerminalConfiguration")
+
+        ElseIf objTarget.GetType.BaseType Is GetType(clsKeithleys24xx) Then
+
+            propertyList.Add("SenseResistanceMode")
+            propertyList.Add("SenseMax")
+            propertyList.Add("SourceVoltageProtectionLevel")
+            propertyList.Add("SourceCurrentProtectionLevel")
+            propertyList.Add("SourceMode")
+
+        ElseIf objTarget.GetType.BaseType Is GetType(clsKeithleys26xx) Then
+
+            propertyList.Add("TSPNode")
+            propertyList.Add("Channel")
+
+            propertyList.Add("SenseMax")
+            propertyList.Add("SourceVoltageProtectionLevel")
+            propertyList.Add("SourceCurrentProtectionLevel")
+
+        ElseIf objTarget.GetType Is GetType(clsKeithley2520) Then
+            propertyList.Add("ElementsToRead")
+            propertyList.Add("LaserDiodeFunction")
+            propertyList.Add("LaserDiodeCurrentMode")
+            propertyList.Add("LaserDiodeCurrentRange")
+            propertyList.Add("LaserDiodeFixedCurrentAmplitude")
+            propertyList.Add("LaserDiodeCurrentPulseAmplitude")
+            propertyList.Add("LaserDiodeVoltageProtectionLimit")
+            propertyList.Add("LaserDiodeCurrentPulseDelay")
+            propertyList.Add("LaserDiodeCurrentPulseWidth")
+            propertyList.Add("LaserDiodeCurrentSweepStart")
+            propertyList.Add("LaserDiodeCurrentSweepStop")
+            propertyList.Add("LaserDiodeCurrentSweepStep")
+            propertyList.Add("DetectorsBiasVoltageAmplitude")
+            'PropertyDict.Add("Output")
+        ElseIf objTarget.GetType Is GetType(clsKeithley2510) Then
+            propertyList.Add("SetPointTemperature")
+            'PropertyDict.Add("SetPointTolerance")
+            'PropertyDict.Add("SetPointToleranceCount")
+            'PropertyDict.Add("Output")
+        ElseIf objTarget.GetType Is GetType(clsAgilent70950A) Then
+            propertyList.Add("WavelengthCenterPosition")
+            propertyList.Add("WavelengthSpan")
+            propertyList.Add("WavelengthStart")
+            propertyList.Add("WavelengthStop")
+            propertyList.Add("ResolutionBandwidth")
+            propertyList.Add("AmplitudeVariationAveraging")
+        End If
+
+        getSettableProperties = New List(Of System.Reflection.PropertyInfo)
+
+        For Each aPropertyName In propertyList
+
+            getSettableProperties.Add(objTarget.GetType.GetProperty(aPropertyName))
+
+        Next
+
+    End Function
+
+    Private Shared Sub ThrowError(ByVal strReason As String)
+
+        Dim cEx As New CustomException(strReason)
+        Try
+            Throw cEx
+        Catch anEx As CustomException
+            anEx.Log()
+        End Try
+        'Endstation
+        Throw cEx
+
+    End Sub
+
+    Public Shared Sub WriteToConfig()
+
+        Dim strSave As String = ""
+        Dim assignInfoHardware As intfcHardwareDevice
+
+        For Each anAssignment As KeyValuePair(Of String, clsAssignmentInfo) In mListAssignmentInfo ' In GetType(clsDeviceAssignmentHardware).GetFields
+
+            strSave &= anAssignment.Key
+            assignInfoHardware = anAssignment.Value.DeviceObject
+
+            If assignInfoHardware IsNot Nothing Then
+
+                strSave &= "=DeviceType:" & anAssignment.Value.DeviceSetupName '.GetType.ToString
+
+                Dim strValue As String
+
+                For Each aProperty In getSettableProperties(assignInfoHardware)
+
+                    strValue = aProperty.GetValue(assignInfoHardware, Nothing).ToString()
+
+                    'always use a Point as Decimal-Separator:
+                    If IsNumeric(strValue) Then strValue = Trim(Str(CDec(strValue)))
+
+                    strSave &= "," & aProperty.Name & ":" & strValue
+
+                Next
+
+            Else
+
+                strSave &= "=Nothing"
+
+            End If
+
+            strSave &= ";"
+
+        Next
+
+        gConfig.WriteStringToConfig("DeviceAssignments", strSave)
+
+        ReadFromConfig()
+
+    End Sub
+
+    Public Shared Sub ReadFromConfig()
+
+        mListAssignmentInfo = New Dictionary(Of String, clsAssignmentInfo)
+
+        For Each aSubString As String In gConfig.ReadStringFromConfig("DeviceAssignments", False).Split(CChar(";"))
+
+            Dim oType As Object
+            Dim oTmp As Object
+            Dim anAssignType As String 'enumAssignTypes
+            Dim objAssignInfo As New clsAssignmentInfo
+
+            Dim strDeviceInfos As List(Of String) = Split(aSubString, ",").ToList
+
+            anAssignType = Split(aSubString, "=")(0)
+            'check if Hardware is known:
+            If GetType(clsDeviceAssignmentHardware).GetField(anAssignType) Is Nothing Then Continue For
+
+            If strDeviceInfos(0).ToLower.Contains("devicetype") Then
+
+                Try
+                    ' CType(Activator.CreateInstance(System.Type.GetType((Split(strDeviceInfos(0), ":")(1)))), intfcHardwareDevice)
+                    objAssignInfo.DeviceSetupName = Split(strDeviceInfos(0), ":")(1)
+                    oTmp = New clsConfigXMLConverter(gConfig.ReadStringFromConfig(objAssignInfo.DeviceSetupName)).XMLElement("DeviceType").XMLAttribute("DeviceType")
+
+                    If CStr(oTmp).Contains("Modulator.") Then
+                        oTmp = CObj(CStr(oTmp).Replace("Modulator.", "Hardware."))
+                    End If
+                    If CStr(oTmp).Contains("Laser.") Then
+                        oTmp = CObj(CStr(oTmp).Replace("Laser.", "Hardware."))
+                    End If
+                    If CStr(oTmp).Contains("Optipot.") Then
+                        oTmp = CObj(CStr(oTmp).Replace("Optipot.", "Hardware."))
+                    End If
+
+
+                    oType = System.Type.GetType(oTmp)
+                    objAssignInfo.DeviceObject = CType(Activator.CreateInstance(oType), intfcHardwareDevice)
+                Catch ex As Exception
+                    Continue For
+                End Try
+
+                DeviceAssignment(anAssignType) = objAssignInfo
+
+                strDeviceInfos.RemoveAt(0)
+                For Each strProperty In strDeviceInfos
+
+                    Dim aKey As String = strProperty.Split(CChar(":"))(0)
+                    Dim aVal As String = strProperty.Split(CChar(":"))(1)
+
+                    'Point was used as Decimal Separator, convert into Language Specific Format:
+                    If IsNumeric(aVal) Then aVal = Val(aVal).ToString
+
+                    With objAssignInfo.DeviceObject.GetType.GetProperty(aKey)
+
+                        Try
+                            If .PropertyType.IsEnum Then
+                                .SetValue(objAssignInfo.DeviceObject, System.Enum.Parse(.PropertyType, aVal), Nothing)
+                            Else
+                                .SetValue(objAssignInfo.DeviceObject, ValueTypeConv(.PropertyType, aVal), Nothing)
+                            End If
+
+                        Catch ex As Exception
+                            MessageBox.Show("Unknown PropertyKey """ & aKey & """ for Device """ & objAssignInfo.DeviceSetupName & """ found in DeviceAssignment-Configuration. Please check Settings.", "Unknown Property", MessageBoxButtons.OK, MessageBoxIcon.Error)
+
+                        End Try
+
+                    End With
+
+                Next
+
+            Else
+                objAssignInfo = Nothing
+            End If
+
+            DeviceAssignment(anAssignType) = objAssignInfo
+
+        Next
+
+    End Sub
+
+End Class

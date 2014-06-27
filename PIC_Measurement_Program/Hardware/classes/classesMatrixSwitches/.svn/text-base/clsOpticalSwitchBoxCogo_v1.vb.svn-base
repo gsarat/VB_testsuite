@@ -1,0 +1,328 @@
+﻿'Cogo Optical Switch Box version1 (no integrated LaserSource)
+
+Public Class clsOpticalSwitchBoxCogo_v1
+    Inherits clsSerialDevice
+    Implements intfcSwitchSystemOptical
+    Private mLCVStateInput As Integer
+    Private mLCVStateOutput As Integer
+    Private mVOAState As Integer
+    Private mTimeout As Integer = 5
+    Private mCharCount As Integer
+
+    Public Overrides Sub Init()
+        VOA = mVOAState
+    End Sub
+
+    Public Overrides ReadOnly Property Name() As String
+        Get
+            Return "OpticalSwitchBoxCogo v1"
+        End Get
+    End Property
+
+    <attrDeviceMapping("MeasurementSetup", "LCVState_Input")> _
+    Public Property LCVStateInput() As Integer
+        Get
+            Return mLCVStateInput
+        End Get
+        Set(ByVal value As Integer)
+            mLCVStateInput = value
+        End Set
+    End Property
+
+    <attrDeviceMapping("MeasurementSetup", "LCVState_Output")> _
+    Public Property LCVStateOutput() As Integer
+        Get
+            Return mLCVStateOutput
+        End Get
+        Set(ByVal value As Integer)
+            mLCVStateOutput = value
+        End Set
+    End Property
+
+    <attrDeviceMapping("MeasurementSetup", "VOAState")> _
+    Public Property VOAState() As Integer
+        Get
+            Return mVOAState
+        End Get
+        Set(ByVal value As Integer)
+            mVOAState = value
+        End Set
+    End Property
+
+    Public Overrides Sub SetToDefaultSettings()
+        With Me
+            .ComPort = 1
+            .BaudRate = 115200
+            .StopBit = StopBitType.One
+            .Parity = VisaNS.Parity.None
+            .LCVStateInput = 4000
+            .LCVStateOutput = 500
+            .VOAState = 3000
+        End With
+
+    End Sub
+
+    Public ReadOnly Property Temperature() As Decimal
+        Get
+            If m_VISASession IsNot Nothing Then
+                m_VISASession.Timeout = mTimeout
+                Try
+                    mCharCount = 14
+                    Do While mCharCount > 0
+                        m_VISASession.Write("TM2?" & vbCr)
+                        Threading.Thread.Sleep(mTimeout)
+                        Try
+                            Return Val(m_VISASession.ReadString(mCharCount).Replace("TM2?", "").Replace(vbCr, "").Replace(vbLf, ""))
+                            Exit Do
+                        Catch ex1 As Exception
+                            mCharCount -= 1
+                        End Try
+                    Loop
+                Catch ex As Exception
+                    Return -1
+                End Try
+            End If
+        End Get
+    End Property
+
+    Public ReadOnly Property AD0() As Integer
+        Get
+            If m_VISASession IsNot Nothing Then
+                m_VISASession.Timeout = mTimeout
+                Try
+                    mCharCount = 14
+                    Do While mCharCount > 0
+                        m_VISASession.Write("AD0?" & vbCr)
+                        Threading.Thread.Sleep(mTimeout)
+                        Try
+                            Return Val(m_VISASession.ReadString(mCharCount).Replace("AD0?", "").Replace(vbCr, "").Replace(vbLf, ""))
+                            Exit Do
+                        Catch ex1 As Exception
+                            mCharCount -= 1
+                        End Try
+                    Loop
+                Catch ex As Exception
+                    Return -1
+                End Try
+            End If
+        End Get
+    End Property
+    Public ReadOnly Property AD8() As Integer
+        Get
+            If m_VISASession IsNot Nothing Then
+                m_VISASession.Timeout = mTimeout
+                Try
+                    mCharCount = 14
+                    Do While mCharCount > 0
+                        m_VISASession.Write("AD8?" & vbCr)
+                        Threading.Thread.Sleep(mTimeout)
+                        Try
+                            Return Val(m_VISASession.ReadString(mCharCount).Replace("AD8?", "").Replace(vbCr, "").Replace(vbLf, ""))
+                            Exit Do
+                        Catch ex1 As Exception
+                            mCharCount -= 1
+                        End Try
+                    Loop
+                Catch ex As Exception
+                    Return -1
+                End Try
+            End If
+        End Get
+    End Property
+
+    Public ReadOnly Property PD3() As Integer
+        Get
+            If m_VISASession IsNot Nothing Then
+                m_VISASession.Timeout = mTimeout
+                Try
+                    mCharCount = 14
+                    Do While mCharCount > 0
+                        m_VISASession.Write("PD3?" & vbCr)
+                        Threading.Thread.Sleep(mTimeout)
+                        Try
+                            Return Val(m_VISASession.ReadString(mCharCount).Replace("PD3?", "").Replace(vbCr, "").Replace(vbLf, ""))
+                            Exit Do
+                        Catch ex1 As Exception
+                            mCharCount -= 1
+                        End Try
+                    Loop
+                Catch ex As Exception
+                    Return -1
+                End Try
+            End If
+        End Get
+    End Property
+
+    Public ReadOnly Property PD4() As Integer
+        Get
+            If m_VISASession IsNot Nothing Then
+                m_VISASession.Timeout = mTimeout
+                Try
+                    mCharCount = 14
+                    Do While mCharCount > 0
+                        m_VISASession.Write("PD4?" & vbCr)
+                        Threading.Thread.Sleep(mTimeout)
+                        Try
+                            Return Val(m_VISASession.ReadString(mCharCount).Replace("PD4?", "").Replace(vbCr, "").Replace(vbLf, ""))
+                            Exit Do
+                        Catch ex1 As Exception
+                            mCharCount -= 1
+                        End Try
+                    Loop
+                Catch ex As Exception
+                    Return -1
+                End Try
+            End If
+        End Get
+    End Property
+
+    Public ReadOnly Property PD5() As Integer
+        Get
+            If m_VISASession IsNot Nothing Then
+                m_VISASession.Timeout = mTimeout
+                Try
+                    mCharCount = 14
+                    Do While mCharCount > 0
+                        m_VISASession.Write("PD5?" & vbCr)
+                        Threading.Thread.Sleep(mTimeout)
+                        Try
+                            Return Val(m_VISASession.ReadString(mCharCount).Replace("PD5?", "").Replace(vbCr, "").Replace(vbLf, ""))
+                            Exit Do
+                        Catch ex1 As Exception
+                            mCharCount -= 1
+                        End Try
+                    Loop
+                Catch ex As Exception
+                    Return -1
+                End Try
+            End If
+        End Get
+    End Property
+
+    Public ReadOnly Property PD6() As Integer
+        Get
+            If m_VISASession IsNot Nothing Then
+                m_VISASession.Timeout = mTimeout
+                Try
+                    mCharCount = 14
+                    Do While mCharCount > 0
+                        m_VISASession.Write("PD6?" & vbCr)
+                        Threading.Thread.Sleep(mTimeout)
+                        Try
+                            Return Val(m_VISASession.ReadString(mCharCount).Replace("PD6?", "").Replace(vbCr, "").Replace(vbLf, ""))
+                            Exit Do
+                        Catch ex1 As Exception
+                            mCharCount -= 1
+                        End Try
+                    Loop
+                Catch ex As Exception
+                    Return -1
+                End Try
+            End If
+        End Get
+    End Property
+
+    Public Property LCV() As Integer
+        Get
+            If m_VISASession IsNot Nothing Then
+                m_VISASession.Timeout = mTimeout
+
+                Try
+                    mCharCount = 14
+                    Do While mCharCount > 0
+                        m_VISASession.Write("LCV?" & vbCr)
+                        Threading.Thread.Sleep(mTimeout)
+                        Try
+                            Return Val(m_VISASession.ReadString(mCharCount).Replace("LCV?", "").Replace(vbCr, "").Replace(vbLf, ""))
+                            Exit Do
+                        Catch ex1 As Exception
+                            mCharCount -= 1
+                        End Try
+                    Loop
+                Catch ex As Exception
+                    Return -1
+                End Try
+            End If
+        End Get
+        Set(ByVal value As Integer)
+            If m_VISASession IsNot Nothing Then
+                Try
+                    Threading.Thread.Sleep(mTimeout)
+                    m_VISASession.Write("LCV=" & value.ToString & vbCr)
+                    Threading.Thread.Sleep(mTimeout)
+                    m_VISASession.Write("LCV=" & value.ToString & vbCr)
+                    Threading.Thread.Sleep(mTimeout)
+                Catch ex As Exception
+
+                End Try
+
+            End If
+        End Set
+    End Property
+    Private Property VOA() As Integer
+        Get
+            If m_VISASession IsNot Nothing Then
+                m_VISASession.Timeout = mTimeout
+                Try
+                    mCharCount = 14
+                    Do While mCharCount > 0
+                        m_VISASession.Write("VOA?" & vbCr)
+                        Threading.Thread.Sleep(mTimeout)
+                        Try
+                            Return Val(m_VISASession.ReadString(mCharCount).Replace("VOA?", "").Replace(vbCr, "").Replace(vbLf, ""))
+                            Exit Do
+                        Catch ex1 As VisaException
+                            mCharCount -= 1
+                        End Try
+                    Loop
+                Catch ex As Exception
+                    Return -1
+                End Try
+            End If
+        End Get
+        Set(ByVal value As Integer)
+            If m_VISASession IsNot Nothing Then
+                Try
+                    Threading.Thread.Sleep(mTimeout)
+                    m_VISASession.Write("VOA=" & value.ToString & vbCr)
+                    Threading.Thread.Sleep(mTimeout)
+                    m_VISASession.Write("VOA=" & value.ToString & vbCr)
+                    Threading.Thread.Sleep(mTimeout)
+                Catch ex As Exception
+
+                End Try
+
+            End If
+        End Set
+    End Property
+
+    Public Sub SwitchTo(ByVal aSwitchType As intfcSwitchSystemOptical.enumSwitchType) Implements intfcSwitchSystemOptical.SwitchTo
+        If m_VISASession IsNot Nothing Then
+            Select Case aSwitchType
+                Case intfcSwitchSystemOptical.enumSwitchType.DC_Input
+                    Try
+                        Me.LCV = mLCVStateInput
+                    Catch ex As Exception
+
+                    End Try
+                Case intfcSwitchSystemOptical.enumSwitchType.DC_Output
+                    Try
+                        Me.LCV = mLCVStateOutput
+                    Catch ex As Exception
+
+                    End Try
+                Case Else
+                    Dim cEx As New CustomException("Unknown SwitchType" & vbLf)
+                    Try
+                        Throw cEx
+                    Catch anEx As CustomException
+                        anEx.Log()
+                    End Try
+                    'Endstation
+                    Throw cEx
+
+            End Select
+        End If
+
+    End Sub
+End Class

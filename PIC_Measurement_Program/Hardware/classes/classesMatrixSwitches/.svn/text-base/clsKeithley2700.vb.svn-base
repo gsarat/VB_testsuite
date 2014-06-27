@@ -1,0 +1,287 @@
+'Class for accessing the Keithley2700 Matrix-Switchsystem
+'Manual: http://www.keithley.com/data?asset=942
+Public Class clsKeithley2700
+    Inherits clsGPIBDevice
+    Implements intfcSwitchSystemElectrical
+
+    Private mCardNr As Integer
+    Private mBeeper As Boolean
+
+    Private mBM_Init As Boolean
+    Private mAM_Init As Boolean
+    Private mAM_Local As Boolean
+
+    Public Sub New()
+        Me.GPIBIdnString = "KEITHLEY INSTRUMENTS INC.,MODEL 2700"
+    End Sub
+
+    Public Overrides ReadOnly Property Name() As String
+        Get
+            Return "Keithley2700"
+        End Get
+    End Property
+
+    Public Overrides Sub SetToDefaultSettings()
+
+        Me.Beeper = False
+        Me.CardNr = 1
+        Me.GPIBAddressNr = intfcHardwareDevice_old.enumGPIBAddressNr.AUTO
+
+        Me.BeforeMeas_Init = True
+
+        Me.AfterMeas_Init = False
+        Me.AfterMeas_Local = True
+
+    End Sub
+
+ <attrDeviceMapping("General","CardNr")> _
+    Public Property CardNr() As Integer
+
+        Get
+            Return mCardNr
+        End Get
+
+        Set(ByVal value As Integer)
+            mCardNr = value
+        End Set
+
+    End Property
+
+    Private Function isChannelClosed(ByVal intChannel As Integer) As Boolean
+
+        If m_VISASession IsNot Nothing Then
+            'MessageBox.Show(QuerySecure(mVISASession, ":ROUT:MULT:CLOSe?"))
+            Return (QuerySecure(m_VISASession, ":ROUT:MULT:CLOS:STAT? (@" & CStr(mCardNr) & Format(intChannel, "00") & ")") = "1")
+        End If
+
+    End Function
+
+    Private Sub Reset()
+
+        If m_VISASession IsNot Nothing Then
+            System.Threading.Thread.Sleep(20)
+            m_VISASession.Write(":SYST:PRES")
+            System.Threading.Thread.Sleep(20)
+            Me.QuerySecure(m_VISASession, "*OPC?")
+        End If
+
+    End Sub
+
+    Private Sub OpenChannel(ByVal intChannel As Integer)
+
+        If m_VISASession IsNot Nothing Then
+            System.Threading.Thread.Sleep(20)
+            m_VISASession.Write(":ROUT:MULT:OPEN (@" & CStr(mCardNr) & Format(intChannel, "00") & ")")
+        End If
+
+    End Sub
+
+    Private Sub CloseChannel(ByVal intChannel As Integer)
+
+        If m_VISASession IsNot Nothing Then
+            System.Threading.Thread.Sleep(20)
+            m_VISASession.Write(":ROUT:MULT:CLOS (@" & CStr(mCardNr) & Format(intChannel, "00") & ")")
+        End If
+
+    End Sub
+
+    Public Sub OpenAllChannels() Implements intfcSwitchSystemElectrical.ReleaseAll
+
+        If m_VISASession IsNot Nothing Then
+            System.Threading.Thread.Sleep(20)
+            m_VISASession.Write(":ROUT:OPEN:ALL")
+            System.Threading.Thread.Sleep(20)
+            'Me.DisplayText("ALL OPENED")
+            System.Threading.Thread.Sleep(20)
+            Me.QuerySecure(m_VISASession, "*OPC?")
+        End If
+
+    End Sub
+
+    Public Sub SwitchTo(ByVal aSwitchType As intfcSwitchSystemElectrical.enumSwitchType) Implements intfcSwitchSystemElectrical.SwitchTo
+
+        If m_VISASession IsNot Nothing Then
+
+            Me.OpenAllChannels()
+
+            Select Case aSwitchType
+
+                Case intfcSwitchSystemElectrical.enumSwitchType.DC_Photocurrent
+
+                    Me.CloseChannel(3)
+                    Me.CloseChannel(4)
+                    Me.CloseChannel(21)
+                    Me.CloseChannel(33)
+                    Me.CloseChannel(34)
+                    Me.CloseChannel(43)
+
+                    'Me.DisplayText("PHOTOCURRENT")
+
+                Case intfcSwitchSystemElectrical.enumSwitchType.DC_Wavelength
+                    Me.CloseChannel(3)
+                    Me.CloseChannel(4)
+                    Me.CloseChannel(21)
+                    Me.CloseChannel(17)
+                    Me.CloseChannel(26)
+                    'Me.DisplayText("WAVELENGTH")
+
+                Case intfcSwitchSystemElectrical.enumSwitchType.DC_Matrix
+                    Me.CloseChannel(3)
+                    Me.CloseChannel(4)
+                    Me.CloseChannel(21)
+                    Me.CloseChannel(17)
+                    Me.CloseChannel(26)
+                    'Me.DisplayText("MATRIX")
+
+                Case intfcSwitchSystemElectrical.enumSwitchType.DC_ElectrodesU_I
+                    Me.CloseChannel(33)
+                    Me.CloseChannel(42)
+                    'Me.DisplayText("UI-CURVE")
+
+                Case intfcSwitchSystemElectrical.enumSwitchType.DC_ElectrodesU_DC, intfcSwitchSystemElectrical.enumSwitchType.DC_IVCurveIQ_S1_A
+                    Me.CloseChannel(33)
+                    Me.CloseChannel(43)
+                    'Me.DisplayText("U-CURVE")
+
+                Case intfcSwitchSystemElectrical.enumSwitchType.DC_ElectrodesI_DC, intfcSwitchSystemElectrical.enumSwitchType.DC_IVCurveIQ_S2_A
+                    Me.CloseChannel(34)
+                    Me.CloseChannel(43)
+                    'Me.DisplayText("I-CURVE")
+
+                Case intfcSwitchSystemElectrical.enumSwitchType.DC_Matrix_IElectrodeToGround
+                    Me.CloseChannel(2)
+                    Me.CloseChannel(4)
+                    Me.CloseChannel(21)
+                    Me.CloseChannel(17)
+                    Me.CloseChannel(27)
+                    'Me.DisplayText("MATRIX DC")
+
+                Case intfcSwitchSystemElectrical.enumSwitchType.DC_Matrix_IQ
+                    Me.CloseChannel(3)
+                    Me.CloseChannel(4)
+                    Me.CloseChannel(21)
+                    Me.CloseChannel(17)
+                    Me.CloseChannel(26)
+                    Me.CloseChannel(38)
+                    Me.CloseChannel(40)
+                    Me.CloseChannel(15)
+                    'Me.DisplayText("IQ MATRIX")
+
+                Case intfcSwitchSystemElectrical.enumSwitchType.DC_IVCurveIQ_S1_B
+                    Me.CloseChannel(38)
+                    Me.CloseChannel(43)
+                    'Me.DisplayText("IV Curve S1_B")
+
+                Case intfcSwitchSystemElectrical.enumSwitchType.DC_IVCurveIQ_S2_B
+                    Me.CloseChannel(39)
+                    Me.CloseChannel(43)
+                    'Me.DisplayText("IV Curve S2_B")
+
+                Case Else
+                    Dim cEx As New CustomException("Unknown SwitchType" & vbLf)
+                    Try
+                        Throw cEx
+                    Catch anEx As CustomException
+                        anEx.Log()
+                    End Try
+                    'Endstation
+                    Throw cEx
+
+            End Select
+
+            System.Threading.Thread.Sleep(20)
+            Me.QuerySecure(m_VISASession, "*OPC?")
+            System.Threading.Thread.Sleep(300)
+
+        End If
+
+    End Sub
+
+    Public Sub DisplayText(ByVal strText As String)
+
+        If m_VISASession IsNot Nothing Then
+
+            If String.IsNullOrEmpty(strText) Then
+                System.Threading.Thread.Sleep(20)
+                m_VISASession.Write(":DISP:TEXT:STAT OFF")
+            Else
+                System.Threading.Thread.Sleep(20)
+                m_VISASession.Write(":DISP:TEXT:DATA '" & strText & "'")
+                System.Threading.Thread.Sleep(20)
+                m_VISASession.Write(":DISP:TEXT:STAT ON")
+            End If
+
+        End If
+
+    End Sub
+
+    <attrDeviceMapping("General", "Beeper")> _
+       Public Property Beeper() As Boolean
+
+        Get
+            Return mBeeper
+        End Get
+
+        Set(ByVal value As Boolean)
+
+            mBeeper = value
+            If m_VISASession IsNot Nothing Then
+                m_VISASession.Write(":SYST:BEEP:STAT " & Math.Abs(CInt(value)))
+            End If
+
+        End Set
+
+    End Property
+
+    Public Overrides Sub Init()
+
+        If m_VISASession IsNot Nothing Then
+
+            DisplayText("INITIALISING")
+
+            Me.Beeper = mBeeper
+            DisplayText("*")
+
+            Me.CardNr = mCardNr
+
+            DisplayText("**")
+
+            DisplayText("")
+
+            QuerySecure(m_VISASession, "*OPC?")
+
+        End If
+
+    End Sub
+
+ <attrDeviceMapping("BeforeMeasurement","Init")> _
+    Public Property BeforeMeas_Init() As Boolean
+        Get
+            Return mBM_Init
+        End Get
+        Set(ByVal value As Boolean)
+            mBM_Init = value
+        End Set
+    End Property
+
+ <attrDeviceMapping("AfterMeasurement","Init")> _
+    Public Property AfterMeas_Init() As Boolean
+        Get
+            Return mAM_Init
+        End Get
+        Set(ByVal value As Boolean)
+            mAM_Init = value
+        End Set
+    End Property
+
+ <attrDeviceMapping("AfterMeasurement","GoLocal")> _
+    Public Property AfterMeas_Local() As Boolean
+        Get
+            Return mAM_Local
+        End Get
+        Set(ByVal value As Boolean)
+            mAM_Local = value
+        End Set
+    End Property
+
+End Class

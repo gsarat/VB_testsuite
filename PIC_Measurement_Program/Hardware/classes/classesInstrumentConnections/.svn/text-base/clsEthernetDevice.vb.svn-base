@@ -1,0 +1,30 @@
+﻿Public MustInherit Class clsEthernetDevice
+    Implements intfcHardwareDevice
+
+
+    Public Sub CloseSession() Implements intfcHardwareDevice.CloseSession
+
+    End Sub
+
+    Public Sub Init() Implements intfcHardwareDevice.Init
+
+    End Sub
+
+    Public Function IsAvailable() As Boolean Implements intfcHardwareDevice.IsAvailable
+
+    End Function
+
+    Public ReadOnly Property Name() As String Implements intfcHardwareDevice.Name
+        Get
+            Return Nothing
+        End Get
+    End Property
+
+    Public Function OpenSession() As Boolean Implements intfcHardwareDevice.OpenSession
+
+    End Function
+
+    Public Sub SetToDefaultSettings() Implements intfcHardwareDevice.SetToDefaultSettings
+
+    End Sub
+End Class
