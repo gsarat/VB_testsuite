@@ -25,10 +25,5 @@ Public Class frmMDIParent
         End With
     End Sub
 
-    Private Sub Keithley26xxToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles Keithley26xxToolStripMenuItem.Click
-        With frmSimpleKeithleyControl
-            .MdiParent = Me
-            .Show()
-        End With
-    End Sub
+
 End Class
